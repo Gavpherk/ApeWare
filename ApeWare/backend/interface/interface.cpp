@@ -64,13 +64,13 @@ bool Cheat::PopulateFunctionPointers()
     return true;
 }
 
-bool Cheat::HookGameFunction(const char* nickname, const char* _class, const char* _function, void* detour, const char* typesignature) 
+bool Cheat::HookGameFunction(const char* nickname, const char* _class, const char* _function, void* detour, const char* typesignature, bool usesConditions, FuncPtr Condition, const char* conditionName) 
 {
     JFunction* tFunc = GetReversedFunctionInfo(_class, _function, typesignature); 
     if (tFunc) 
     {
-        hookManager.HM_AddHook(nickname, (BYTE*)tFunc->RVA, detour);
-        hookManager.HM_EnableHook(nickname);
+        hookManager.HM_AddHook(nickname, (BYTE*)tFunc->RVA, detour, 15, usesConditions, Condition, conditionName);
+        hookManager.HM_EnableHook(nickname, conditionName);
         return true;
     }
     else 

@@ -15,7 +15,7 @@ public:
     bool UpdateBackendTypeInfos();
     bool InitFunctionSystem(bool ignoreFilters);
     bool PopulateFunctionPointers();
-    bool HookGameFunction(const char* nickname, const char* _class, const char* _function, void* detour, const char* typesignature = "NA");
+    bool HookGameFunction(const char* nickname, const char* _class, const char* _function, void* detour, const char* typesignature = "N/A", bool usesConditions = false, FuncPtr Condition = nullptr, const char* conditionName = "N/A");
     bool DisableHookGameFunction(const char* nickname);
     bool DisableALLHooks();
     bool SetupCheat(std::vector<std::pair<const char*, FeatureBase*>> FeaturesList);
