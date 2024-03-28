@@ -16,7 +16,7 @@
 //nhloman json
 #include "json/json.h"
 using json = nlohmann::json;
-
+typedef std::function<void()> FuncPtr;
 //HookManager
 //#include "Hooking/Hook.h"
 

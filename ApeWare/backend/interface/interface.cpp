@@ -56,12 +56,6 @@ bool Cheat::InitFunctionSystem(bool ignoreFilters = false)
     return true;
 }
 
-bool Cheat::ConditionFunctionHooks() 
-{
-
-
-    return true;
-}
 
 bool Cheat::PopulateFunctionPointers()
 {

@@ -149,6 +149,7 @@
     <ClCompile Include="backend\Functions\FunctionFetcher.cpp" />
     <ClCompile Include="backend\Functions\JFunction\JFunctionUtils.cpp" />
     <ClCompile Include="backend\HookManager\HookManager.cpp" />
+    <ClCompile Include="backend\HookManager\HookManagerUtils.cpp" />
     <ClCompile Include="backend\interface\interface.cpp" />
     <ClCompile Include="backend\TypeInfos\JTypeInfo\JTypeInfoUtils.cpp" />
     <ClCompile Include="backend\TypeInfos\TypeInfoJSONParser.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="backend\Functions\FunctionFetcher.h" />
     <ClInclude Include="backend\Functions\JFunction\JFunctionUtils.h" />
     <ClInclude Include="backend\HookManager\HookManager.h" />
+    <ClInclude Include="backend\HookManager\HookManagerUtils.h" />
     <ClInclude Include="backend\interface\interface.h" />
     <ClInclude Include="backend\Structs.h" />
     <ClInclude Include="backend\TypeInfos\JTypeInfo\JTypeInfoUtils.hpp" />

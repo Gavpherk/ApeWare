@@ -14,7 +14,6 @@ public:
     bool InitTypeInfoSystem(bool ignoreFilters);
     bool UpdateBackendTypeInfos();
     bool InitFunctionSystem(bool ignoreFilters);
-    bool ConditionFunctionHooks();
     bool PopulateFunctionPointers();
     bool HookGameFunction(const char* nickname, const char* _class, const char* _function, void* detour, const char* typesignature = "NA");
     bool DisableHookGameFunction(const char* nickname);

@@ -9,7 +9,8 @@ struct jTypeinfo
 	bool populated;
 };
 
-struct JFunction {
+struct JFunction 
+{
 	std::string ClassName;
 	std::string MethodName;
 	std::string TypeSignature;

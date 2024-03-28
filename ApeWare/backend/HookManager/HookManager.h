@@ -1,7 +1,8 @@
 #pragma once
 #include "../../include/includes.h"
 
-class Hook {
+class Hook 
+{
 private:
     BYTE* m_byteSource;
     void* m_byteDestination;
@@ -10,21 +11,35 @@ private:
     size_t m_szLen;
     bool m_enabled;
 public:
-    Hook(BYTE* source, void* destination, size_t size = 15);
+    bool usesConditions;
+    bool isConditioned;
+    const char* name;
+    const char* conditionName = "N/A";
+
+    FuncPtr condition;
+
+    Hook(BYTE* source, void* destination, size_t size = 15, bool usesConditions = false, FuncPtr condition = nullptr, const char* name = "NAME", const char* conditionName = "N/A");
     ~Hook();
-    void Enable();
+    void Enable(const std::string name, const char* conditionName);
     void Disable();
 };
 
-class HookManager {
+class HookManager 
+{
 private:
     std::unordered_map<std::string, Hook*> m_hooks;
 public:
     HookManager() {}
     ~HookManager();
-    void HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size = 15);
-    bool HM_EnableHook(const std::string& name);
+    void HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size = 15, bool usesConditons = false, FuncPtr condition = nullptr, const char* conditionName = "N/A");
+    bool HM_EnableHook(const std::string& name, const char* conditionName = "N/A");
     bool HM_DisableHook(const std::string& name);
     void HM_EnableAllHooks();
     void HM_DisableAllHooks();
 };
+
+
+namespace ConditionHooks
+{
+    inline std::map<std::string, FuncPtr> conditionsMap;
+}
