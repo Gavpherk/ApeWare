@@ -75,6 +75,7 @@ bool Cheat::HookGameFunction(const char* nickname, const char* _class, const cha
     }
     else 
     {
+        std::cout << "[INTERFACE] HookGameFunction returned a NullPTR JFunction, make sure your referencing the class and function name properly." << std::endl;
         return false;
     }
 }

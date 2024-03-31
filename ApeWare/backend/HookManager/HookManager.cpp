@@ -3,14 +3,17 @@
 
 Hook::Hook(BYTE* source, void* destination, size_t size, bool usesConditions, FuncPtr condition, const char* name, const char* conditionName) : m_byteSource(source), m_byteDestination(destination), m_pGateway(nullptr), m_szLen(size), m_enabled(false) 
 {
+    ++ConditionHooks::HookCount;
     this->usesConditions = usesConditions;
     this->isConditioned = false;
     this->name = name;
 
     if (usesConditions)
     {
+        ++ConditionHooks::conditionCount;
         this->conditionName = conditionName;
         this->condition = condition;
+        ConditionHooks::conditionsMap[this->conditionName] = this->condition;
     }
 
 #ifdef _WIN32
@@ -31,7 +34,8 @@ void Hook::Enable(const std::string name, const char* conditionName)
     {
         if (this->condition == nullptr)
         {
-            std::cout << "A Condition was called, but the hook object has a nullptr FuncPtr Field, aborting condition for " + name << " this may lead to a crash using this hook." << std::endl;
+            ++ConditionHooks::failedConditions;
+            std::cout << "[HOOK MANAGER] A Condition was called, but the hook object has a nullptr FuncPtr Field, aborting condition for " + (std::string)conditionName << " this may lead to a crash using this hook." << std::endl;
         }
         else
         {
@@ -168,4 +172,4 @@ void Hook1()
     
 }
 
-//TO DO, add populating system for condition map, test system.
+//TO DO, test system.

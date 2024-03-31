@@ -31,6 +31,7 @@ private:
 public:
     HookManager() {}
     ~HookManager();
+
     void HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size = 15, bool usesConditons = false, FuncPtr condition = nullptr, const char* conditionName = "N/A");
     bool HM_EnableHook(const std::string& name, const char* conditionName = "N/A");
     bool HM_DisableHook(const std::string& name);
@@ -41,5 +42,8 @@ public:
 
 namespace ConditionHooks
 {
+    inline int failedConditions;
+    inline int conditionCount;
+    inline int HookCount;
     inline std::map<std::string, FuncPtr> conditionsMap;
 }

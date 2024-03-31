@@ -16,9 +16,6 @@
 //nhloman json
 #include "json/json.h"
 using json = nlohmann::json;
-typedef std::function<void()> FuncPtr;
-//HookManager
-//#include "Hooking/Hook.h"
 
 //backend structs
 #include "../backend/Structs.h"
@@ -32,6 +29,7 @@ typedef std::function<void()> FuncPtr;
 #include "FeatureManager/FeatureBase/FeatureBase.h"
 #include "FeatureManager/FeatureManager.h"
 #include "mem/mem.h"
+#include "mem/mempatch.h"
 #include "SigScan/Sig.h"
 #include "Types/INCLUDE_TYPES.h"
 #include "il2cpp/il2cpp.h"
@@ -51,9 +49,12 @@ typedef std::function<void()> FuncPtr;
 //feature includes
 #include "../features/Player/player.h"
 #include "../features/Weapon/weapon.h"
-//menu feature last
+
+//menu feature always last
 #include "../features/menu/menu.h"
 
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+
 typedef uintptr_t PTR;
+typedef std::function<void()> FuncPtr;

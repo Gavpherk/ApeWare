@@ -8,6 +8,6 @@ void ConditionFunctionHook(const char* condition_str, std::map<std::string, Func
     }
     else
     {
-        std::cout << "Hook condition not recognized, make sure you've properly initialized it." << std::endl;
+        std::cout << "[HOOK MANAGER] Hook condition name not recognized, make sure you've properly initialized it." << std::endl;
     }
 }
