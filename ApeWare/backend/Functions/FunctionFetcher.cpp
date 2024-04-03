@@ -27,7 +27,6 @@ bool parseJsonFunctions(const char* filePath, std::vector<std::shared_ptr<JFunct
 	try
 	{
 		json jsonArray = json::parse(inputJsonFile);
-
 		for (const auto& item : jsonArray)
 		{
 			std::string pClass = item["Class"];
@@ -40,6 +39,7 @@ bool parseJsonFunctions(const char* filePath, std::vector<std::shared_ptr<JFunct
 				jFunc->TypeSignature = item["TypeSignature"];
 				jFunc->RVA = nullptr;
 				result.push_back(jFunc);
+				
 			}
 			else if (all == true)
 			{
@@ -51,7 +51,10 @@ bool parseJsonFunctions(const char* filePath, std::vector<std::shared_ptr<JFunct
 				jFunc->RVA = nullptr;
 				result.push_back(jFunc);
 			}
+			
+			
 		}
+
 	}
 
 	catch (const std::exception& e)

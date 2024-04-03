@@ -8,7 +8,7 @@ bool Cheat::RegisterTypeInfos(std::vector<const char*> TypeInfoList)
 {
     for (auto& typeinfo : TypeInfoList)
     {
-        AddTypeInfo(typeinfo); 
+        AddTypeInfo(typeinfo);
     }
     return true;
 }
@@ -64,22 +64,6 @@ bool Cheat::PopulateFunctionPointers()
     return true;
 }
 
-bool Cheat::HookGameFunction(const char* nickname, const char* _class, const char* _function, void* detour, const char* typesignature, bool usesConditions, FuncPtr Condition, const char* conditionName) 
-{
-    JFunction* tFunc = GetReversedFunctionInfo(_class, _function, typesignature); 
-    if (tFunc) 
-    {
-        hookManager.HM_AddHook(nickname, (BYTE*)tFunc->RVA, detour, 15, usesConditions, Condition, conditionName);
-        hookManager.HM_EnableHook(nickname, conditionName);
-        return true;
-    }
-    else 
-    {
-        std::cout << "[INTERFACE] HookGameFunction returned a NullPTR JFunction, make sure your referencing the class and function name properly." << std::endl;
-        return false;
-    }
-}
-
 bool Cheat::DisableHookGameFunction(const char* nickname)
 {
         hookManager.HM_DisableHook(nickname);
@@ -117,7 +101,22 @@ bool Cheat::LoopCheat()
 
         if (show)
         {
+            if (!cursorclipped)
+            {
+                ClipCursor(NULL);
+            }
+
             Globals::featureManager.RenderFeature("Menu"); // calls menu::OnRender
+        }
+        else if (!show)
+        {
+            if (cursorclipped)
+            {
+                RECT rect;
+                GetClientRect(GetDesktopWindow(), &rect);
+                ClipCursor(&rect);
+                cursorclipped = show;
+            }
         }
 
         if (GetAsyncKeyState(VK_DELETE) & 1)

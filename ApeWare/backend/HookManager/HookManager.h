@@ -1,5 +1,7 @@
 #pragma once
-#include "../../include/includes.h"
+#include "../Functions/JFunction/JFunctionUtils.h"
+
+typedef std::function<void()> FuncPtr;
 
 class Hook 
 {
@@ -14,7 +16,7 @@ public:
     bool usesConditions;
     bool isConditioned;
     const char* name;
-    const char* conditionName = "N/A";
+    const char* conditionName;
 
     FuncPtr condition;
 
@@ -32,8 +34,9 @@ public:
     HookManager() {}
     ~HookManager();
 
+    bool HookGameFunction(const char* nickname, JFunction* taretFunc, void* detour, bool usesConditions, FuncPtr Condition, const char* conditionName);
     void HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size = 15, bool usesConditons = false, FuncPtr condition = nullptr, const char* conditionName = "N/A");
-    bool HM_EnableHook(const std::string& name, const char* conditionName = "N/A");
+    bool HM_EnableHook(const std::string& name, const char* conditionName);
     bool HM_DisableHook(const std::string& name);
     void HM_EnableAllHooks();
     void HM_DisableAllHooks();

@@ -1,11 +1,10 @@
-#include "player.h"
+#include "Player.h"
 #include "../../include/mem/mem.h"
 
 void Player::OnInit()
 {
 
 }
-
 
 void Player::OnLoop()
 {
@@ -23,7 +22,3 @@ void Player::OnRender()
 }
 
 
-void Player::UnlockAll(bool toggle)
-{
-
-}

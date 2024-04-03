@@ -1,16 +1,21 @@
-#include "include/includes.h"
+﻿#include "include/includes.h"
 #include "backend/interface/interface.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Cheat APEWARE; // Init cheat objext
-std::vector<const char*> typeinfos = {}; // for filters, so little in this game filters are not needed.
-std::vector<const char*> classes = {"UnityEngine.Display", "UnityEngine.Camera", "UnityEngine.Transform"};
-std::vector<std::pair<const char*, FeatureBase*>> Features = 
+std::vector<const char*> typeinfos = {"BonusCreator.东丁丐丈三丞不七丒_TypeInfo", "DebugConsole_TypeInfo", "DeveloperConsoleController_TypeInfo", "Player_move_c_TypeInfo", "WeaponBonusItem_TypeInfo", "ChestController_TypeInfo", "AGSPlayerClient_TypeInfo", "PlayerDamageable_TypeInfo", "PlayerData_TypeInfo", "RespawnWindow_TypeInfo", "WeaponManager_TypeInfo", "PixelPassView_TypeInfo", "DeveloperConsoleView_TypeInfo", "UIToggle_TypeInfo"}; // for filters, so little in this game filters are not needed.
+std::vector<const char*> classes = {"UnityEngine.Display", "UnityEngine.Camera", "UnityEngine.Transform", "UnityEngine.Cursor", "DebugConsole", "DeveloperConsoleController", "BonusCreator", "Player_move_c", "WeaponBonusItem", "ChestController", "AGSPlayerClient", "PlayerDamageable", "RespawnWindow", "WeaponManager", "PixelPassView", "DeveloperConsoleView", "UIToggle"};
+std::vector<std::pair<const char*, FeatureBase*>> Features =
 {
 	{"Menu", new Menu},
 	{"Player", new Player},
-	{"Weapon", new Weapon}
+	{"ESP", new ESP},
+	{"Weapon", new Weapon},
+	{"Movement", new Movement},
+	{"Misc", new Misc},
+	{"Account", new Account},
+	{"Debug", new DEBUG}
 };
 
 Present oPresent;
@@ -46,8 +51,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			APEWARE.RegisterTypeInfos(typeinfos); // sets up filters for parsing typeinfos
 			APEWARE.RegisterFunctionClasses(classes); // sets up filters for parsing functions
 
-			APEWARE.InitTypeInfoSystem(true);
-			APEWARE.InitFunctionSystem(true);
+			APEWARE.InitTypeInfoSystem(false);
+			APEWARE.InitFunctionSystem(false);
 
 			APEWARE.SetupCheat(Features); // Init cheat classes, init typeinfo and function filters, parse jsons, populate function and typeinfo vectors.
 

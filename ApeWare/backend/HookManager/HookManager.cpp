@@ -14,6 +14,11 @@ Hook::Hook(BYTE* source, void* destination, size_t size, bool usesConditions, Fu
         this->conditionName = conditionName;
         this->condition = condition;
         ConditionHooks::conditionsMap[this->conditionName] = this->condition;
+        std::cout << "Condition Added with Name: " << conditionName << "\n";
+    }
+    else if (!usesConditions)
+    {
+        std::cout << "Hook with no conditions Initialized \n";
     }
 
 #ifdef _WIN32
@@ -114,7 +119,7 @@ HookManager::~HookManager()
 
 void HookManager::HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size, bool usesConditions, FuncPtr condition, const char* conditionName) 
 {
-    m_hooks[name] = new Hook(source, destination, size, usesConditions, condition, conditionName);
+    m_hooks[name] = new Hook(source, destination, size, usesConditions, condition, name.c_str(), conditionName);
 }
 
 bool HookManager::HM_EnableHook(const std::string& name, const char* conditionName)
@@ -146,10 +151,6 @@ void HookManager::HM_EnableAllHooks()
         pair.second->Enable(pair.second->name, pair.second->conditionName);
     }
 
-    for (const auto& pair : m_hooks) 
-    {
-        delete pair.second;
-    }
 }
 
 void HookManager::HM_DisableAllHooks() 
@@ -166,8 +167,23 @@ void HookManager::HM_DisableAllHooks()
 }
 
 
+bool HookManager::HookGameFunction(const char* nickname, JFunction* targetFunc, void* detour, bool usesConditions, FuncPtr Condition, const char* conditionName)
+{
+    if (targetFunc)
+    {
+        HM_AddHook(nickname, (BYTE*)targetFunc->RVA, detour, 15, usesConditions, Condition, conditionName);
+        HM_EnableHook(nickname, conditionName);
+        return true;
+    }
+    else
+    {
+        std::cout << "[INTERFACE] HookGameFunction returned a NullPTR JFunction, make sure your referencing the class and function name properly." << std::endl;
+        return false;
+    }
+}
+
 //ex
-void Hook1()
+void PlayerRecievedCondition()
 {
     
 }

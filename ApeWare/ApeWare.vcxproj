@@ -136,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,9 +153,19 @@
     <ClCompile Include="backend\interface\interface.cpp" />
     <ClCompile Include="backend\TypeInfos\JTypeInfo\JTypeInfoUtils.cpp" />
     <ClCompile Include="backend\TypeInfos\TypeInfoJSONParser.cpp" />
+    <ClCompile Include="features\Account\Account.cpp" />
+    <ClCompile Include="features\Debug\Debug.cpp" />
+    <ClCompile Include="features\ESP\ESP.cpp" />
     <ClCompile Include="features\Menu\menu.cpp" />
-    <ClCompile Include="features\Player\player.cpp" />
-    <ClCompile Include="features\Weapon\weapon.cpp" />
+    <ClCompile Include="features\Misc\Misc.cpp" />
+    <ClCompile Include="features\Movement\Movement.cpp" />
+    <ClCompile Include="features\Player\Player.cpp" />
+    <ClCompile Include="features\Weapon\Weapon.cpp" />
+    <ClCompile Include="features\_INTERNAL_FEATURES\Authenticator\Authenticator.cpp" />
+    <ClCompile Include="features\_INTERNAL_FEATURES\Discord\DiscordPresence.cpp" />
+    <ClCompile Include="features\_INTERNAL_FEATURES\Heartbeat\Pulse.cpp" />
+    <ClCompile Include="features\_INTERNAL_FEATURES\Integrity\Integrity.cpp" />
+    <ClCompile Include="features\_INTERNAL_FEATURES\UserAccount\UserAccount.cpp" />
     <ClCompile Include="include\Draw\Custom.cpp" />
     <ClCompile Include="include\Draw\Draw.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
@@ -199,9 +209,19 @@
     <ClInclude Include="backend\Structs.h" />
     <ClInclude Include="backend\TypeInfos\JTypeInfo\JTypeInfoUtils.hpp" />
     <ClInclude Include="backend\TypeInfos\TypeInfoJSONParser.h" />
+    <ClInclude Include="features\Account\Account.h" />
+    <ClInclude Include="features\Debug\Debug.h" />
+    <ClInclude Include="features\ESP\ESP.h" />
     <ClInclude Include="features\Menu\menu.h" />
-    <ClInclude Include="features\Player\player.h" />
-    <ClInclude Include="features\Weapon\weapon.h" />
+    <ClInclude Include="features\Misc\Misc.h" />
+    <ClInclude Include="features\Movement\Movement.h" />
+    <ClInclude Include="features\Player\Player.h" />
+    <ClInclude Include="features\Weapon\Weapon.h" />
+    <ClInclude Include="features\_INTERNAL_FEATURES\Authenticator\Authenticator.h" />
+    <ClInclude Include="features\_INTERNAL_FEATURES\Discord\DiscordPresence.h" />
+    <ClInclude Include="features\_INTERNAL_FEATURES\Heartbeat\Pulse.h" />
+    <ClInclude Include="features\_INTERNAL_FEATURES\Integrity\Integrity.h" />
+    <ClInclude Include="features\_INTERNAL_FEATURES\UserAccount\UserAccount.h" />
     <ClInclude Include="include\Draw\Custom.h" />
     <ClInclude Include="include\Draw\Draw.h" />
     <ClInclude Include="include\IL2CPPResolver\API\Callback.hpp" />
