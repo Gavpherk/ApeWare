@@ -4,28 +4,32 @@
 #include "../../backend/TypeInfos/JTypeInfo/JTypeInfoUtils.hpp"
 #include "../../backend/interface/interface.h"
 
-void __stdcall PlayerRecieved(void* _this, System_String_o* json, void* _Method)
-{
-	std::string jsonstr = SystemStringToStdString(json);
-	std::cout << "CAPTURED PLAYER JSON: \n\n\n\n";
-	printf("%s", jsonstr.c_str());
+void* AccountBlockedWindow = nullptr;
 
-	return oPlayerReceived(_this, json, _Method);
+void __stdcall ContactUsClicked(void* _this, void* _Method)
+{
+	AccountBlockedWindow = _this;
+	printf("BanWindow Object: \n");
+	printf("%p\n", AccountBlockedWindow);
+	return oContactUsClicked(_this, _Method);
 }
 
-void PlayerReceivedCondition()
+void ContactUsCondition()
 {
-	JFunction* jf_playerReceived = GetReversedFunctionInfo("AGSSubmitScoreResponse", "FromJSON");
-	BYTE* playerReceivedBaseAddr = (BYTE*)jf_playerReceived->RVA;
-	printf("%p", jf_playerReceived->RVA);
-	printf("\n");
-	mem::Nop((playerReceivedBaseAddr + 0x7), 7); // nop cmp
-	mem::Nop((playerReceivedBaseAddr + 0x17), 2); // nop jmp linked to previous cmp
-	std::cout << "PlayerReceivedCondition DONE!! \n\n\n";
+	JFunction* c_jf_ContactUs = GetReversedFunctionInfo("PGCompany.AuthorizationScene.AccountBlockedWindow", "U_ContactUsClicked");
+	BYTE* ContactUsBaseAddr = (BYTE*)c_jf_ContactUs->RVA;
+	printf("%p\n", c_jf_ContactUs->RVA);
+	mem::Nop((ContactUsBaseAddr + 0x4), 5); 
+	printf("ContactUs Condition DONE!! \n");
 }
 
 void Menu::OnInit()
 {
+	JFunction* jf_ContactUs = GetReversedFunctionInfo("PGCompany.AuthorizationScene.AccountBlockedWindow", "U_ContactUsClicked");
+	HookManager* t_hookmanager = new HookManager;
+	Globals::g_hookmanager = (LONG64*)t_hookmanager;
+	oContactUsClicked = (tContactUsClicked)t_hookmanager->HookGameFunction("ContactUsClicked", jf_ContactUs, 17, (BYTE*)ContactUsClicked, true, &ContactUsCondition, "ContactUsClickedCondition");
+
 	g_menu = (Menu*)Globals::featureManager.FindFeature("Menu");
 	g_weapon = (Weapon*)Globals::featureManager.FindFeature("Weapon");
 	g_player = (Player*)Globals::featureManager.FindFeature("Player");
@@ -34,10 +38,7 @@ void Menu::OnInit()
 	g_misc = (Misc*)Globals::featureManager.FindFeature("Misc");
 	g_movement = (Movement*)Globals::featureManager.FindFeature("Movement");
 	g_debug = (DEBUG*)Globals::featureManager.FindFeature("Debug");
-	//JFunction* jf_playerReceived = GetReversedFunctionInfo("AGSSubmitScoreResponse", "FromJSON");
-	HookManager* t_hookmanager = new HookManager;
-	Globals::g_hookmanager = (LONG64*)t_hookmanager;
-  //t_hookmanager->HookGameFunction("FromJSON", jf_playerReceived, &PlayerRecieved, true, &PlayerReceivedCondition, "FromJSONCondition");
+
 }
 
 void Menu::OnLoop()
@@ -164,28 +165,74 @@ void Menu::OnRender()
 				{
 					if (ImGui::Button("Placeholder"))
 					{
+						jTypeinfo* jt_GameController = GetReversedTypeInfo("GameController_TypeInfo");
+						JFunction* jf_StartNewGame = GetReversedFunctionInfo("PGCompany.AuthorizationScene.AccountBlockedWindow", "U_StartNewGameClicked");
 
-						JFunction* jf_HandleGemsInputSubmit = GetReversedFunctionInfo("DeveloperConsoleController", "HandleGemsInputSubmit"); // request the function RVA from the API
-						jTypeinfo* jt_DeveloperConsoleController = GetReversedTypeInfo("DeveloperConsoleController_TypeInfo"); // request a pointer to "this" - the parent class this function lies in.
-						JFunction* jf_set_gems_input = GetReversedFunctionInfo("DeveloperConsoleView", "set_GemsInput"); // request the function RVA from the API
-						jTypeinfo* jt_DeveloperConsoleView = GetReversedTypeInfo("DeveloperConsoleView_TypeInfo");
-
-
-						if (jf_HandleGemsInputSubmit && jt_DeveloperConsoleController && jf_set_gems_input && jt_DeveloperConsoleView) // try not to reference nullptrs or you will crash, hence the error catch
+						if (jf_StartNewGame && jt_GameController) // try not to reference nullptrs or you will crash, hence the error catch
 						{
 
-							oSetGemsInput = (tSetGemsInput)jf_set_gems_input->RVA;
+							GameController_StaticFields* sf_GameController = (GameController_StaticFields*)jt_GameController->staticfield;
+							oStartNewGame = (tStartNewGame)jf_StartNewGame->RVA;
+							
+							oStartNewGame(AccountBlockedWindow, nullptr);
 
-							DeveloperConsoleView_StaticFields* devconsoleview = (DeveloperConsoleView_StaticFields*)jt_DeveloperConsoleView->staticfield;
-							DeveloperConsoleController_StaticFields* devconsolecontroller = (DeveloperConsoleController_StaticFields*)jt_DeveloperConsoleController->staticfield;
+							if (sf_GameController)
+							{
+								printf("OnlineModeController Object: ");
+								printf("%p", sf_GameController->onlineMode);
+								printf("\n");
+								TeamController_o* TeamController = (TeamController_o*)sf_GameController->onlineMode->fields.teamController;
+								printf("TeamController Object PTR: ");
+								printf("%p", TeamController);
+								printf("\n");
 
-							oSetGemsInput(devconsoleview->_________, 10000, nullptr);
+								printf("Friendly Team EntityList: ");
+								printf("%p", TeamController->fields.firstTeamPlayers);
+								printf("\n");
+								printf("Enemy Team EntityList: ");
+								printf("%p", TeamController->fields.secondTeamPlayers);
+								printf("\n");
 
-							oHandleGemsInput = (tHandleGemsInput)jf_HandleGemsInputSubmit->RVA; // populate your typedef with the RVA
+							}
 
-							oHandleGemsInput(devconsolecontroller->_2__________, devconsoleview->_________->fields.gemsInput, nullptr); // call the RVA with a pointer to "this" - which is the addr for the typeinfo of the parent class, method arg is always nullptr
+
+
 						}
 
+					}
+
+
+					if (ImGui::Button("bool1"))
+					{
+
+						jTypeinfo* jt_FreeChestInfo = GetReversedTypeInfo("FreeChestController_TypeInfo"); // request a pointer to "this" - the parent class this function lies in.
+						JFunction* jf_accrue_reward = GetReversedFunctionInfo("FreeChestController", "AccrueReward"); // request the function RVA from the API
+
+
+						if (jt_FreeChestInfo && jf_accrue_reward) // try not to reference nullptrs or you will crash, hence the error catch
+						{
+							oChestAccrueReward = (tChestAccrueReward)jf_accrue_reward->RVA;
+
+							Rilisoft_FreeChestController_StaticFields* FreeChestController = (Rilisoft_FreeChestController_StaticFields*)jt_FreeChestInfo->staticfield;
+
+							printf("%p", FreeChestController->_________);
+						}
+					}
+
+
+					if (ImGui::Button("bool2"))
+					{
+						jTypeinfo* jt_DeveloperConsoleController2 = GetReversedTypeInfo("DeveloperConsoleController_TypeInfo"); // request a pointer to "this" - the parent class this function lies in.
+						DeveloperConsoleController_StaticFields* devconsolecontroller2 = (DeveloperConsoleController_StaticFields*)jt_DeveloperConsoleController2->staticfield;
+						devconsolecontroller2->Bool2 = !devconsolecontroller2->Bool2;
+					}
+
+
+					if (ImGui::Button("bool1"))
+					{
+						jTypeinfo* jt_DeveloperConsoleController3 = GetReversedTypeInfo("DeveloperConsoleController_TypeInfo"); // request a pointer to "this" - the parent class this function lies in.
+						DeveloperConsoleController_StaticFields* devconsolecontroller3 = (DeveloperConsoleController_StaticFields*)jt_DeveloperConsoleController3->staticfield;
+						devconsolecontroller3->Bool3 = !devconsolecontroller3->Bool3;
 					}
 
 					ImGui::EndTabItem();
@@ -197,18 +244,18 @@ void Menu::OnRender()
 					{
 
 						jTypeinfo* jt_DeveloperConsoleControllers = GetReversedTypeInfo("DeveloperConsoleController_TypeInfo"); // request a pointer to "this" - the parent class this function lies in.
-						jTypeinfo* jt_DeveloperConsoleView = GetReversedTypeInfo("DeveloperConsoleView_TypeInfo");
 
 
-						DeveloperConsoleView_StaticFields* devconsoleview = (DeveloperConsoleView_StaticFields*)jt_DeveloperConsoleView->staticfield;
 						DeveloperConsoleController_StaticFields* devconsolecontroller = (DeveloperConsoleController_StaticFields*)jt_DeveloperConsoleControllers->staticfield;
 
 						printf("ConsoleController: ");
-						printf("%p", devconsolecontroller->_2__________);
+						printf("%p", devconsolecontroller->Controller_o);
 						printf("\n");
 						printf("ConsoleView: ");
-						printf("%p", devconsoleview->_________);
+						printf("%p", devconsolecontroller->Controller_o->fields.view);
 						printf("\n");
+						printf("DevUI: ");
+						printf("%p", devconsolecontroller->Controller_o->fields.almanacDevUiToggle);
 
 					}
 

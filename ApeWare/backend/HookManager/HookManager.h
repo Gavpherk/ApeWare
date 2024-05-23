@@ -7,9 +7,9 @@ class Hook
 {
 private:
     BYTE* m_byteSource;
-    void* m_byteDestination;
+    BYTE* m_byteDestination;
     void* m_pGateway;
-    BYTE stolenBytes[15]; // Assuming maximum hook size is 15 bytes
+    BYTE stolenBytes[100];
     size_t m_szLen;
     bool m_enabled;
 public:
@@ -20,9 +20,9 @@ public:
 
     FuncPtr condition;
 
-    Hook(BYTE* source, void* destination, size_t size = 15, bool usesConditions = false, FuncPtr condition = nullptr, const char* name = "NAME", const char* conditionName = "N/A");
+    Hook(BYTE* source, BYTE* destination, size_t size = 15, bool usesConditions = false, FuncPtr condition = nullptr, const char* name = "NAME", const char* conditionName = "N/A");
     ~Hook();
-    void Enable(const std::string name, const char* conditionName);
+    void* Enable(const std::string name, const char* conditionName);
     void Disable();
 };
 
@@ -34,9 +34,9 @@ public:
     HookManager() {}
     ~HookManager();
 
-    bool HookGameFunction(const char* nickname, JFunction* taretFunc, void* detour, bool usesConditions, FuncPtr Condition, const char* conditionName);
-    void HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size = 15, bool usesConditons = false, FuncPtr condition = nullptr, const char* conditionName = "N/A");
-    bool HM_EnableHook(const std::string& name, const char* conditionName);
+    void* HookGameFunction(const char* nickname, JFunction* taretFunc, size_t size, BYTE* detour, bool usesConditions, FuncPtr Condition, const char* conditionName);
+    void HM_AddHook(const std::string& name, BYTE* source, BYTE* destination, size_t size, bool usesConditons = false, FuncPtr condition = nullptr, const char* conditionName = "N/A");
+    void* HM_EnableHook(const std::string& name, const char* conditionName);
     bool HM_DisableHook(const std::string& name);
     void HM_EnableAllHooks();
     void HM_DisableAllHooks();

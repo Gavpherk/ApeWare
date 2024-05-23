@@ -1,12 +1,17 @@
 #include "HookManager.h"
 #include "HookManagerUtils.h"
 
-Hook::Hook(BYTE* source, void* destination, size_t size, bool usesConditions, FuncPtr condition, const char* name, const char* conditionName) : m_byteSource(source), m_byteDestination(destination), m_pGateway(nullptr), m_szLen(size), m_enabled(false) 
+Hook::Hook(BYTE* source, BYTE* destination, size_t size, bool usesConditions, FuncPtr condition, const char* name, const char* conditionName) 
 {
+    this->m_byteSource = source;
+    this->m_byteDestination = destination;
+    this->m_szLen = size;
     ++ConditionHooks::HookCount;
     this->usesConditions = usesConditions;
     this->isConditioned = false;
     this->name = name;
+    this->m_pGateway = nullptr;
+    this->m_enabled = false;
 
     if (usesConditions)
     {
@@ -21,20 +26,6 @@ Hook::Hook(BYTE* source, void* destination, size_t size, bool usesConditions, Fu
         std::cout << "Hook with no conditions Initialized \n";
     }
 
-#ifdef _WIN32
-    DWORD oldProt;
-    VirtualProtect(m_byteSource, m_szLen, PAGE_EXECUTE_READWRITE, &oldProt);
-    memcpy(stolenBytes, m_byteSource, m_szLen);
-    VirtualProtect(m_byteSource, m_szLen, oldProt, &oldProt);
-#endif
-}
-
-Hook::~Hook() {
-    Disable();
-}
-
-void Hook::Enable(const std::string name, const char* conditionName)
-{
     if (!this->isConditioned && this->usesConditions)
     {
         if (this->condition == nullptr)
@@ -48,49 +39,77 @@ void Hook::Enable(const std::string name, const char* conditionName)
         }
     }
 
-    if (m_enabled)
-        return;
+    DWORD oldprot;
+    VirtualProtect((void*)this->m_byteSource, this->m_szLen, PAGE_EXECUTE_READWRITE, &oldprot);
+    memcpy(this->stolenBytes, (void*)this->m_byteSource, this->m_szLen);
+    VirtualProtect((void*)this->m_byteSource, this->m_szLen, oldprot, &oldprot);
 
+}
+
+Hook::~Hook() {
+    Disable();
+}
+
+void* Hook::Enable(const std::string name, const char* conditionName)
+{
     BYTE* jumpbackAddress = nullptr;
     BYTE* functionDestinationAddress = nullptr;
 
-    m_pGateway = VirtualAlloc(nullptr, 0x100, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-
-    if (!m_pGateway)
-        return;
- 
-    DWORD oldProt;
-    VirtualProtect(m_pGateway, m_szLen + 13, PAGE_EXECUTE_READWRITE, &oldProt);  // Assuming jumpShellCodeSize is 13
-    memcpy(m_pGateway, stolenBytes, m_szLen);
-
+    this->m_pGateway = VirtualAlloc(nullptr, 0x100, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+   
+        if (this->m_pGateway)
+        {
+            printf("[+] Allocated memory for gateway at: %p\n", this->m_pGateway);
+        }
+        else
+        {
+            printf("[!] Failed allocated memory for gateway at: %p\n", this->m_pGateway);
+            return 0;
+        }
+    
 #ifdef _WIN64
-    jumpbackAddress = m_byteSource + m_szLen;
-    functionDestinationAddress = (BYTE*)m_byteDestination;
-    BYTE jumpShellcode[] = 
+    BYTE jumpShellcode[] =
     {
-        0x49, 0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x41, 0xFF, 0xE2
+        0x49, 0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,		//mov r10, jumpAddress
+        0x41, 0xFF, 0xE2												//jmp r10
     };
+    static const size_t jumpShellCodeSize = 13;
+    static const size_t jumpAddressOffset = 2;
+
+    jumpbackAddress = this->m_byteSource + this->m_szLen;
+    functionDestinationAddress = this->m_byteDestination;
 #else
-    jumpbackAddress = (BYTE*)((m_byteSource + m_szLen) - ((uintptr_t)m_pGateway + m_szLen + 5));  // Assuming jumpShellCodeSize is 5
-    functionDestinationAddress = (BYTE*)(m_byteDestination - m_byteSource - 5);
-    BYTE jumpShellcode[] = 
+    BYTE jumpShellcode[] =
     {
-        0xE9, 0x00, 0x00, 0x00, 0x00
+        0xE9, 0x00, 0x00, 0x00, 0x00									//jmp jumpAddress (jump address must be the relative address)
     };
+    static const size_t jumpShellCodeSize = 5;
+    static const size_t jumpAddressOffset = 1;
+
+    jumpbackAddress = (BYTE*)((this->m_byteSource + this->m_szLen) - ((uintptr_t)this->m_pGateway + this->m_szLen + jumpShellCodeSize));
+    functionDestinationAddress = (BYTE*)(this->m_byteDestination - this->m_byteSource - jumpShellCodeSize);
 #endif
 
-    size_t jumpAddressOffset = sizeof(jumpShellcode) - sizeof(jumpbackAddress);
-    *(BYTE**)(jumpShellcode + jumpAddressOffset) = jumpbackAddress;
-    memcpy((void*)((uintptr_t)m_pGateway + m_szLen), jumpShellcode, sizeof(jumpShellcode));
+    DWORD dwOldProtection;
+    VirtualProtect(this->m_pGateway, this->m_szLen + jumpShellCodeSize, PAGE_EXECUTE_READWRITE, &dwOldProtection);	//setup gateway
+    {
+        memcpy(this->m_pGateway, this->stolenBytes, this->m_szLen);
 
-    VirtualProtect(m_byteSource, m_szLen, PAGE_EXECUTE_READWRITE, &oldProt);
-    memset(m_byteSource, 0x90, m_szLen);
-    *(BYTE**)(jumpShellcode + jumpAddressOffset) = functionDestinationAddress;
-    memcpy(m_byteSource, jumpShellcode, sizeof(jumpShellcode));
-    VirtualProtect(m_byteSource, m_szLen, oldProt, &oldProt);
+        *(BYTE**)(jumpShellcode + jumpAddressOffset) = jumpbackAddress;
+        memcpy((void*)((uintptr_t)this->m_pGateway + this->m_szLen), jumpShellcode, jumpShellCodeSize);
+        VirtualProtect(this->m_pGateway, this->m_szLen + jumpShellCodeSize, dwOldProtection, &dwOldProtection);
+}
 
-    m_enabled = true;
+    VirtualProtect((void*)this->m_byteSource, this->m_szLen, PAGE_EXECUTE_READWRITE, &dwOldProtection);				//setup jump to our function
+    {
+        memset((void*)this->m_byteSource, 0x90, this->m_szLen);
+
+        *(BYTE**)(jumpShellcode + jumpAddressOffset) = functionDestinationAddress;
+        memcpy(this->m_byteSource, jumpShellcode, jumpShellCodeSize);
+        VirtualProtect((void*)this->m_byteSource, this->m_szLen, dwOldProtection, &dwOldProtection);
+    }
+
+    return this->m_pGateway;
 }
 
 void Hook::Disable() 
@@ -117,20 +136,20 @@ HookManager::~HookManager()
     m_hooks.clear();
 }
 
-void HookManager::HM_AddHook(const std::string& name, BYTE* source, void* destination, size_t size, bool usesConditions, FuncPtr condition, const char* conditionName) 
+void HookManager::HM_AddHook(const std::string& name, BYTE* source, BYTE* destination, size_t size, bool usesConditions, FuncPtr condition, const char* conditionName) 
 {
-    m_hooks[name] = new Hook(source, destination, size, usesConditions, condition, name.c_str(), conditionName);
+    m_hooks[name] = new Hook((BYTE*)source, destination, size, usesConditions, condition, name.c_str(), conditionName);
 }
 
-bool HookManager::HM_EnableHook(const std::string& name, const char* conditionName)
+void* HookManager::HM_EnableHook(const std::string& name, const char* conditionName)
 {
     if (m_hooks.find(name) != m_hooks.end()) 
     {
-        m_hooks[name]->Enable(name, conditionName);
-        return true;
+       void* HookReturnAddress = m_hooks[name]->Enable(name, conditionName);
+        return HookReturnAddress;
     }
 
-    return false;
+    return nullptr;
 }
 
 bool HookManager::HM_DisableHook(const std::string& name) 
@@ -167,25 +186,20 @@ void HookManager::HM_DisableAllHooks()
 }
 
 
-bool HookManager::HookGameFunction(const char* nickname, JFunction* targetFunc, void* detour, bool usesConditions, FuncPtr Condition, const char* conditionName)
+void* HookManager::HookGameFunction(const char* nickname, JFunction* targetFunc, size_t size, BYTE* detour, bool usesConditions, FuncPtr Condition, const char* conditionName)
 {
     if (targetFunc)
     {
-        HM_AddHook(nickname, (BYTE*)targetFunc->RVA, detour, 15, usesConditions, Condition, conditionName);
-        HM_EnableHook(nickname, conditionName);
-        return true;
+        HM_AddHook(nickname, (BYTE*)targetFunc->RVA, detour, size, usesConditions, Condition, conditionName);
+        void* newFunctionReturnAddress = HM_EnableHook(nickname, conditionName);
+        return newFunctionReturnAddress;
     }
     else
     {
         std::cout << "[INTERFACE] HookGameFunction returned a NullPTR JFunction, make sure your referencing the class and function name properly." << std::endl;
-        return false;
+        return nullptr;
     }
 }
 
-//ex
-void PlayerRecievedCondition()
-{
-    
-}
 
 //TO DO, test system.

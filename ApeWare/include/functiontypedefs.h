@@ -33,9 +33,9 @@ typedef Vector3(__stdcall* tGetTransformForward)(Transform* _this, void* _Method
 typedef Vector3(__stdcall* tGetTransformUp)(Transform* _this, void* _Method);
 typedef Transform* (__stdcall* tGetTransformFromComponent)(uintptr_t component, void* _Method);
 
-typedef void(__stdcall* tHandleGemsInput)(void* _this, void* UIinput, void* _Method);
-typedef void(__stdcall* tPlayerReceived)(void* _this, System_String_o* json, void* _Method);
-typedef void(__stdcall* tSetGemsInput)(void* _this, int32_t value, void* _method);
+typedef void(__stdcall* tContactUsClicked)(void* _this, void* _Method);
+typedef void(__stdcall* tChestAccrueReward)(void* _this, int value, void* _method);
+typedef void(__stdcall* tStartNewGame)(void* _this, void* _method);
 
 
 inline tGetMainCamera oGetMainCamera = 0;
@@ -66,6 +66,6 @@ inline tGetTransformForward oGetTransformForward = 0;
 inline tGetTransformUp oGetTransformUp = 0;
 inline tGetTransformFromComponent oGetTransformFromComponent = 0;
 
-inline tHandleGemsInput oHandleGemsInput = 0;
-inline tSetGemsInput oSetGemsInput = 0;
-inline tPlayerReceived oPlayerReceived = 0;
+inline tChestAccrueReward oChestAccrueReward = 0;
+inline tContactUsClicked oContactUsClicked = 0;
+inline tStartNewGame oStartNewGame = 0;
