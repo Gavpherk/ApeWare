@@ -33,4 +33,9 @@ public:
 	Movement* g_movement;
 	DEBUG* g_debug;
 	HookManager* m_hookManager;
+
+private:
+	void SetTheme(ImGuiStyle& style);
+	void PreRender();
+	void PostRender();
 };

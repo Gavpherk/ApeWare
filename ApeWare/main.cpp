@@ -4,8 +4,8 @@
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Cheat APEWARE; // Init cheat objext
-std::vector<const char*> typeinfos = {"BonusCreator.东丁丐丈三丞不七丒_TypeInfo", "DebugConsole_TypeInfo", "DeveloperConsoleController_TypeInfo", "Player_move_c_TypeInfo", "WeaponBonusItem_TypeInfo", "ChestController_TypeInfo", "AGSPlayerClient_TypeInfo", "PlayerDamageable_TypeInfo", "PlayerData_TypeInfo", "RespawnWindow_TypeInfo", "WeaponManager_TypeInfo", "PixelPassView_TypeInfo", "DeveloperConsoleView_TypeInfo", "UIToggle_TypeInfo", "Rilisoft.FreeChestController_TypeInfo", "OnlineModeController_TypeInfo", "GameController_TypeInfo", "AuthSceneController_TypeInfo"}; // for filters, so little in this game filters are not needed.
-std::vector<const char*> classes = {"UnityEngine.Display", "UnityEngine.Camera", "UnityEngine.Transform", "UnityEngine.Cursor", "DebugConsole", "DeveloperConsoleController", "BonusCreator", "Player_move_c", "WeaponBonusItem", "ChestController", "AGSPlayerClient", "PlayerDamageable", "RespawnWindow", "WeaponManager", "PixelPassView", "DeveloperConsoleView", "UIToggle", "Rilisoft.FreeChestController", "TeamController", "OnlineModeController", "GameController", "PGCompany.AuthorizationScene.AccountBlockedWindow", "PGCompany.AuthorizationScene.AuthInterfaceController", "AuthSceneController"};
+std::vector<const char*> typeinfos = {""}; // for filters, so little in this game filters are not needed.
+std::vector<const char*> classes = {"UnityEngine.Display", "UnityEngine.Camera", "UnityEngine.Transform", "UnityEngine.Cursor"};
 std::vector<std::pair<const char*, FeatureBase*>> Features =
 {
 	{"Menu", new Menu},
